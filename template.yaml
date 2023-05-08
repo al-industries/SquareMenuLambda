@@ -1,0 +1,41 @@
+Transform: AWS::Serverless-2016-10-31
+Description: lambdas
+Globals:
+  Function:
+    Timeout: 20
+Resources:
+  SquareMenuLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SquareMenuLambda/getMenuObjects/
+      Runtime: python3.9
+      Handler: app.lambda_handler
+      Description: SquareMenuLambda
+      Events:
+          SquareMenuLambda:
+             Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+             Properties:
+                Path: /SquareMenuLambda
+                Method: get
+      Environment:
+        Variables:
+          SQUARE_ACCESS_TOKEN: "SQUARE_ACCESS_TOKEN"
+      Layers:
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:4
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: SQUARE_ACCESS_TOKEN
+
+Outputs:
+# ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+# Find out more about other implicit resources you can reference within SAM
+# https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  SquareMenuLambdaApi:
+    Description: "API Gateway endpoint URL for Prod stage for SquareMenuLambda function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/SquareMenuLambda/"
+  SquareMenuLambdaFunction:
+    Description: "SquareMenuLambda Function ARN"
+    Value: !GetAtt SquareMenuLambdaFunction.Arn
+  SquareMenuLambdaFunctionIamRole:
+    Description: "Implicit IAM Role created for SquareMenuLambda function"
+    Value: !GetAtt SquareMenuLambdaFunctionRole.Arn

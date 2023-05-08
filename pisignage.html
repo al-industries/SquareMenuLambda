@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Square Menu</title>
+  <style>
+
+@font-face {
+    font-family:"squaremenu";
+    src: url("font.ttf")
+}
+html, body, h1, h2, h3 {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header {
+    text-align: center;
+    justify-content: center;
+    background-color: white;
+    padding: 5px;
+    }
+
+    .header .red-section {
+    display: inline-block;
+    width: calc(100% / 3);
+    height: 100%;
+    background-color: red;
+    padding: 5px;
+    font-family:'squaremenu';
+  }
+
+
+.item-grid {
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 5px;
+  column-gap: 5px;
+  overflow: auto;
+  align-content: flex-start;
+}
+
+.item {
+  flex: 0 0 calc(8%);
+  flex-direction: column;
+  align-items: center;
+  border: 5px solid #ff0000;
+  padding: 5px;
+  text-align: center;
+  max-width: 250px;
+  max-height: 220px;
+}
+
+.item img {
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  margin-bottom: 5px;
+}
+
+.item h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-family:'squaremenu';
+}
+
+.item p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #000000;
+  font-family:'squaremenu';
+}
+
+.item.vegan {
+  border: 5px solid #2bff00;
+}
+
+.item.dairyfree {
+  border: 5px solid #1707ff;
+}
+
+
+.item-section {
+  display: contents;
+}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="red-section">
+      <h2>Today's Pastry & Bread Selection<br /><h2>
+      <h3>Buy 5 get 1 Free!<br />
+      Items in green are vegan. Items in blue are dairy free.</h3>
+    </div>
+	</div>
+  <div class="item-grid"></div>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var queries = [
+        { name: 'Pastry', query: 'squareObjectID' },
+        { name: 'Vegan Pastry', query: 'squareObjectID'},
+      ];
+
+      var $itemGrid = $('.item-grid');
+
+      $.each(queries, function(i, query) {
+        // Create a new section for each query
+        var $itemSection = $('<div>').addClass('item-section');
+        // var $heading = $('<h2>').text(query.name);
+        // $itemSection.append($heading);
+        $itemGrid.append($itemSection);
+
+        // Get the items for this query
+        var url = 'LambdaApiURL' + query.query;
+        $.getJSON(url, function(data) {
+          $.each(data, function(i, item) {
+            var $item = $('<div>').addClass('item');
+
+            // Add a custom class to items with a certain name
+            if (query.name === 'Vegan Pastry') {
+              $item.addClass('vegan');
+            }
+
+            var $image = $('<img>').attr('src', item.ImageUrl).attr('alt', item.name);
+            var $name = $('<h4>').text(item.Name);
+            var $price = $('<p>').text(item.Price);
+
+            $item.append($image, $name, $price);
+            $itemSection.append($item);
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
